@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drone Aruco Recognition System</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0; background-color: #f0f2f5; display: flex; height: 100vh; }
+        .sidebar { width: 350px; min-width: 300px; padding: 20px; background-color: #fff; box-shadow: 2px 0 5px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+        .main-content { flex-grow: 1; padding: 20px; text-align: center; }
+        h1, h2 { color: #333; }
+        .video-container { border: 2px solid #ccc; border-radius: 8px; overflow: hidden; display: inline-block; background-color: #000; }
+        img { display: block; max-width: 100%; max-height: 70vh; }
+        button { width: 100%; padding: 12px; font-size: 16px; cursor: pointer; border: none; border-radius: 5px; color: white; margin-top: 10px; font-weight: bold; }
+        .btn-add { background-color: #007bff; }
+        .btn-start { background-color: #28a745; }
+        .btn-reset { background-color: #dc3545; }
+        .scrollable-list { flex-grow: 1; overflow-y: auto; margin: 15px 0; border: 1px solid #ddd; padding: 10px; border-radius: 5px; }
+        .target-list, .results-list { list-style: none; padding: 0; margin: 0; }
+        .target-list li, .results-list li { background-color: #e9ecef; margin-bottom: 8px; padding: 10px; border-radius: 5px; font-size: 18px; text-align: center; }
+        .results-list li.is-target { background-color: #d4edda; color: #155724; font-weight: bold; border: 2px solid #c3e6cb; }
+        .main-results-display { margin-top: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .found-target-card { background-color: #28a745; color: white; padding: 20px 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); text-align: center; }
+        .found-target-card .title { font-size: 2.5em; font-weight: bold; margin: 0; text-transform: uppercase; }
+        .found-target-card .details { font-size: 1.8em; margin: 5px 0 0 0; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        {% if app_mode == 'ghi_nho' %}
+            <h2>Bước 1: Cung cấp mã</h2>
+            <p>Đưa một hoặc nhiều mã vào khung hình và nhấn nút bên dưới.</p>
+            <form action="/add_targets" method="post">
+                <button type="submit" class="btn-add">Thêm các mã đang thấy</button>
+            </form>
+            <hr style="margin: 20px 0;">
+            <h3>Các mã đã cung cấp: ({{ target_ids|length }})</h3>
+            <div class="scrollable-list">
+                {% if target_ids %}
+                    <ul class="target-list">
+                        {% for id in target_ids %}
+                            <li>ID: {{ id }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p style="text-align: center; color: #6c757d;">Chưa có mã nào.</p>
+                {% endif %}
+            </div>
+            {% if target_ids %}
+                <form action="/start_detection" method="post">
+                    <button type="submit" class="btn-start">Bắt đầu nhận diện</button>
+                </form>
+            {% endif %}
+        {% endif %}
+        {% if app_mode == 'nhan_dien' %}
+            <h2>Bước 2: Kết quả nhận diện</h2>
+            <p>Kết quả chi tiết được ghi nhận tại đây.</p>
+            <h3>Các mã đã tìm thấy: ({{ results|length }})</h3>
+            <div class="scrollable-list">
+                <ul class="results-list">
+                     {% for item in results %}
+                        <li class="{{ 'is-target' if item.is_target else '' }}">
+                            Thứ tự: {{ item.position }} | ID: {{ item.id }}
+                            {% if item.is_target %} (Mã của bạn) {% endif %}
+                        </li>
+                     {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        <form action="/reset" method="post" style="margin-top: auto;">
+            <button type="submit" class="btn-reset">Reset hệ thống</button>
+        </form>
+    </div>
+    <div class="main-content">
+        <h1>Hệ thống nhận diện Aruco cho Drone</h1>
+        <div class="video-container">
+            <img src="{{ url_for('video_feed') }}">
+        </div>
+        {% if app_mode == 'nhan_dien' %}
+            <div class="main-results-display">
+                {% for item in results %}
+                    {% if item.is_target %}
+                        <div class="found-target-card">
+                            <p class="title">ĐÃ TÌM THẤY MÃ CỦA BẠN</p>
+                            <p class="details">Thứ tự: {{ item.position }} | ID: {{ item.id }}</p>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
