@@ -4,13 +4,28 @@ import numpy as np
 from picamera2 import Picamera2
 import time
 
-# --- CẤU HÌNH ARUCO ---
+# --- CẤU HÌNH MỚI: Mở rộng lên 14 loại từ điển Aruco ---
 ARUCO_DICTIONARIES = {
-    "DICT_4X4_50": cv2.aruco.DICT_4X4_50,
-    "DICT_5X5_100": cv2.aruco.DICT_5X5_100,
-    "DICT_6X6_250": cv2.aruco.DICT_6X6_250,
-    "DICT_7X7_250": cv2.aruco.DICT_7X7_250,
+    # 4x4 Dictionaries
+	"DICT_4X4_50": cv2.aruco.DICT_4X4_50,
+	"DICT_4X4_100": cv2.aruco.DICT_4X4_100,
+	"DICT_4X4_250": cv2.aruco.DICT_4X4_250,
+	"DICT_4X4_1000": cv2.aruco.DICT_4X4_1000,
+    # 5x5 Dictionaries
+	"DICT_5X5_50": cv2.aruco.DICT_5X5_50,
+	"DICT_5X5_100": cv2.aruco.DICT_5X5_100,
+	"DICT_5X5_250": cv2.aruco.DICT_5X5_250,
+	"DICT_5X5_1000": cv2.aruco.DICT_5X5_1000,
+    # 6x6 Dictionaries
+	"DICT_6X6_50": cv2.aruco.DICT_6X6_50,
+	"DICT_6X6_100": cv2.aruco.DICT_6X6_100,
+	"DICT_6X6_250": cv2.aruco.DICT_6X6_250,
+	"DICT_6X6_1000": cv2.aruco.DICT_6X6_1000,
+    # 7x7 Dictionaries
+	"DICT_7X7_50": cv2.aruco.DICT_7X7_50,
+	"DICT_7X7_100": cv2.aruco.DICT_7X7_100,
 }
+# ----------------------------------------------------
 
 # --- QUẢN LÝ TRẠNG THÁI TOÀN CỤC ---
 app_mode = 'ghi_nho'
@@ -32,7 +47,6 @@ def gen_frames():
     global candidate_ids, app_mode
 
     while True:
-        # ĐỌC FRAME TỪ PICAMERA3
         frame = picam2.capture_array()
         
         # --- LOGIC NHẬN DIỆN NHIỀU LOẠI ARUCO ---
@@ -120,5 +134,4 @@ def reset():
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    # Đổi tên file chương trình chính thành 'drone_app.py' hoặc tên bất kỳ không trùng với thư viện
     app.run(host='0.0.0.0', port=5000, debug=True)
